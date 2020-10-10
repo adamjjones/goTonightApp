@@ -21,7 +21,7 @@ const App = () => {
   // const toggleModal = () => {
   //   setModal(!modal)
   useEffect(() =>
-    getData()
+    getData(), []
   )
   const [region, setRegion] = useState({
     latitude: 51.5078788,
