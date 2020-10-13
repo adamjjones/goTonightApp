@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Fragment, StyleSheet, Button, View, SafeAreaView, Text, Alert, TouchableOpacity, Image, TextInput, Modal } from 'react-native';
 import venueInfo from './components/venueInfo';
-import { NavigationNativeContainer } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import GTMap from './components/GTMap'
 
 const Stack = createStackNavigator();
@@ -19,32 +19,38 @@ const App = () => {
     getData()
   }, [])
   const getData = () => {
-    console.log('getData called')
     if (events.length === 0) {
       fetch('http://gotonight.com/api/events.cfm')
         .then(response => {
-          console.log('response', response)
           return response.json()
         })
         .then(data => {
-          console.log('setevents', data)
-          setEvents(data)
-        }).catch(console.error)
+          // console.log('data', data)
+          const data2 = data.filter(ev => {
+            return ev.venueLat && ev.venueLat !== 0.0 &&
+              ev.venueLng && parseFloat(ev.venueLng) !== 0.0
+          })
+          // console.log('data2', data2)
+          setEvents(data2)
+        })
+        .catch(err => {
+          console.error(err)
+        })
     }
   };
-  console.log('events', events)
+  const gtmap = <GTMap events={events} />
   return (
-    <SafeAreaView style={styles.container}>
-      {/* <Stack.Navigator>
-        <Stack.Screen
-          name="venueInfo"
-          component={GTMap}
-          events={events}
-          options={{ title: 'Welcome', events: events }}
-        />
-      </Stack.Navigator> */}
-      <GTMap events={events} />
-    </SafeAreaView>
+    <NavigationContainer>
+      <SafeAreaView style={styles.container}>
+        <Stack.Navigator initialRouteName="GotonightMap">
+          <Stack.Screen
+            name="GotonightMap"
+            options={{ title: `Where Will We Go Tonight? (${events.length} venues)` }} >
+            {() => <GTMap events={events} />}
+          </Stack.Screen>
+        </Stack.Navigator>
+      </SafeAreaView>
+    </NavigationContainer >
   )
 }
 

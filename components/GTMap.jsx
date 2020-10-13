@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MapView, { Marker } from "react-native-maps";
-import { View, Text } from 'react-native';
+import { View, Text, WebView, Linking } from 'react-native';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function GTMap(props) {
@@ -10,7 +11,6 @@ export default function GTMap(props) {
     latitudeDelta: 3.000,
     longitudeDelta: 3.000,
   }
-  console.log('gtmap.props', props)
   const [region, setRegion] = useState(defaultInitialRegion)
   const { events } = props
   return (
@@ -18,15 +18,23 @@ export default function GTMap(props) {
       style={{ flex: 1, width: 500 }}
       region={region}
       initialRegion={defaultInitialRegion}>
-      {events.filter(ev => {
-        return ev.venueLat && ev.venueLng
-      }).map((ev, index) => {
-        console.log('index', index)
+      {events.map((ev, index) => {
         return <Marker key={`e${index}`} coordinate={{
           latitude: ev.venueLat,
           longitude: ev.venueLng
         }}
-        />
+        >
+          <View style={{
+            borderRadius: 15,
+            border: '1px solid black',
+            backgroundColor: "white", padding: 10
+          }}>
+            <Text>
+              {ev.venueName}
+            </Text>
+          </View>
+
+        </Marker>
       })}
     </MapView>
   );
