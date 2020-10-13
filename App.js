@@ -1,125 +1,51 @@
-// import { StatusBar } from 'expo-status-bar';
-// import React from 'react';
-// import { Fragment,StyleSheet, Text, View, SectionList, FlatList } from 'react-native';
+import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Fragment, StyleSheet, Button, View, SafeAreaView, Text, Alert, TouchableOpacity, Image, TextInput, Modal } from 'react-native';
-import MapView, { Marker } from "react-native-maps";
-import PropTypes from 'prop-types'
+import venueInfo from './components/venueInfo';
+import { NavigationNativeContainer } from '@react-navigation/native';
+import GTMap from './components/GTMap'
+
+const Stack = createStackNavigator();
 
 // const Separator = () => (
 //   <View style={styles.separator} />
 // );
 
-const getData = () => {
-  fetch('http://dev.gotonight.com/api/events.cfm')
-    .then(response => response.json())
-    .then(data => console.log(data));
-}
 
 const App = () => {
-  // const [modal, setModal] = useState(false);
-  // const toggleModal = () => {
-  //   setModal(!modal)
-  useEffect(() =>
-    getData(), []
-  )
-  const [region, setRegion] = useState({
-    latitude: 51.5078788,
-    longitude: -0.0877321,
-    latitudeDelta: 0.009,
-    longitudeDelta: 0.009
-  })
+  let [events, setEvents] = useState([])
+  useEffect(() => {
+    getData()
+  }, [])
+  const getData = () => {
+    console.log('getData called')
+    if (events.length === 0) {
+      fetch('http://gotonight.com/api/events.cfm')
+        .then(response => {
+          console.log('response', response)
+          return response.json()
+        })
+        .then(data => {
+          console.log('setevents', data)
+          setEvents(data)
+        }).catch(console.error)
+    }
+  };
+  console.log('events', events)
   return (
-    < SafeAreaView style={styles.container} >
-      <MapView
-        style={{ flex: 1, width: 500 }}
-        region={region}
-        onRegionChangeComplete={region => setRegion(region)}
-        initialRegion={{
-          latitude: 51.5078788,
-          longitude: -0.04324,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05
-        }}>
-        <Marker coordinate={{ latitude: 51.5078788, longitude: -0.0877321 }} />
-      </MapView>
-
-      {/* <View>
-        <TouchableOpacity>
-          <Text style={styles.title}>
-            The title and onPress handler are required. It is recommended to set accessibilityLabel to help make your app usable by everyone.
-      </Text>
-          <Button
-            title={`Press Me - ${modal}`}
-            onPress={toggleModal}
-          />
-          <Image
-            style={{ width: 380, height: 150 }}
-            source={{
-              uri: 'http://miro.medium.com/max/900/1*V3lEj-lK6xveF09ebDiySg.png'
-            }}
-          />
-          <TextInput
-            style={{ height: 100, borderColor: 'gray', borderWidth: 1 }}
-          />
-        </TouchableOpacity>
-      </View>
-
-      {modal &&
-        <Modal
-          animationType="slide"
-          visible={modal}
-          style={{ width: 380, height: 150 }}
-          onRequestClose={toggleModal}
-        >
-          <Button
-            style={{ width: 100, height: 100, flex: 1, flexDirection: "row" }}
-            onPress={toggleModal} title="Close Me" />
-        </Modal>
-      }
-
-      <View>
-        <Text style={styles.title}>
-          Adjust the color in a way that looks standard on each platform. On  iOS, the color prop controls the color of the text. On Android, the color adjusts the background color of the button.
-      </Text>
-        <Button
-          title={`Press me ${modal}`}
-          color="#f194ff" 
+    <SafeAreaView style={styles.container}>
+      {/* <Stack.Navigator>
+        <Stack.Screen
+          name="venueInfo"
+          component={GTMap}
+          events={events}
+          options={{ title: 'Welcome', events: events }}
         />
-      </View>
-      <Separator />
-      <View>
-        <Text style={styles.title}>
-          All interaction for the component are disabled.
-      </Text>
-        <Button
-          title="Press me"
-          disabled
-          onPress={() => Alert.alert('Cannot press this one')}
-        />
-      </View>
-      <Separator />
-      <View>
-        <Text style={styles.title}>
-          This layout strategy lets the title define the width of the button.
-      </Text>
-        <View style={styles.fixToText}>
-          <Button
-            title="Left button"
-            onPress={() => Alert.alert('Left button pressed')}
-          />
-          <Button
-            title="Right button"
-            onPress={() => Alert.alert('Right button pressed')}
-          />
-        </View>
-      </View> */}
-    </SafeAreaView >
+      </Stack.Navigator> */}
+      <GTMap events={events} />
+    </SafeAreaView>
   )
-
-};
-App.viewPropTypes = {
-  style: PropTypes.object
 }
 
 
